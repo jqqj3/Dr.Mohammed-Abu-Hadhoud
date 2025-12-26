@@ -1,0 +1,202 @@
+#include <iostream>
+#include <cstdlib>
+#include <cstdlib>
+#include <string>
+using namespace std;
+
+enum enGameChoice { Stone = 1, Paper = 2, Scissors = 3 };
+enum enWinner { Player1 = 1, Computer = 2, Draw = 3 };
+
+struct stRoundInfo {
+    short roundNumber = 0;
+    enGameChoice playerChoise;
+    enGameChoice computerChoice;
+    enWinner winner;
+    string WinnerName;
+};
+
+struct stGameResults {
+    short gameRounds = 0;
+    short player1WinTimes = 0;
+    short computer2WinTimes = 0;
+    short drawTimes = 0;
+    enWinner gameWinner;
+    string winnerName = "No Winner";
+};
+
+int RandomNumber(int from, int to) {
+
+    int randNum = rand() % (to - from + 1) + from;
+
+    return randNum;
+}
+
+void ReadHowManyRounds(stGameResults & gameResult) {
+    
+    do {
+        cout << "How many rounds 1 to 10:";
+        cin >> gameResult.gameRounds;
+    } while (gameResult.gameRounds < 1 || gameResult.gameRounds > 10);
+
+}
+
+void WinnerName(stRoundInfo & roundInfo) {
+    if (roundInfo.winner == enWinner::Computer)
+        roundInfo.WinnerName = "Computer";
+    else if (roundInfo.winner == enWinner::Player1)
+            roundInfo.WinnerName = "Player1";
+    else
+        roundInfo.WinnerName = "Draw";
+}
+
+string ChoiseThing(enGameChoice roundInfo) {
+    
+    
+    if (roundInfo == enGameChoice::Stone)
+        return "Stone";
+    else if (roundInfo == enGameChoice::Paper)
+        return "Paper";
+    else
+        return "Scissors";
+}
+
+void PrintGameOverScreen(stRoundInfo roundInfo) {
+    cout << "Player1 Choice  : " << ChoiseThing(roundInfo.playerChoise) << endl;
+    cout << "Computer Choice : " << ChoiseThing(roundInfo.computerChoice) << endl;
+    cout << "Round Winner\t: [" << roundInfo.WinnerName << "]" << endl;
+}
+
+void WhoWinner(stRoundInfo roundInfo, stGameResults& gameresults) {
+    if (roundInfo.computerChoice == roundInfo.playerChoise)
+    {
+        gameresults.drawTimes++;
+        roundInfo.winner = enWinner::Draw;
+        WinnerName(roundInfo);
+        PrintGameOverScreen(roundInfo);
+        system("color 6F");
+    }
+    else if (roundInfo.computerChoice == enGameChoice::Scissors && roundInfo.playerChoise == enGameChoice::Paper) {
+        gameresults.computer2WinTimes++;
+        roundInfo.winner = enWinner::Computer;
+        WinnerName(roundInfo);
+        PrintGameOverScreen(roundInfo);
+        system("color 4F");
+        cout << "\a";
+    }
+    else if (roundInfo.computerChoice == enGameChoice::Stone && roundInfo.playerChoise == enGameChoice::Scissors) {
+        gameresults.computer2WinTimes++;
+        roundInfo.winner = enWinner::Computer;
+        WinnerName(roundInfo);
+        PrintGameOverScreen(roundInfo);
+        system("color 4F"); cout << "\a";
+    }
+    else if (roundInfo.computerChoice == enGameChoice::Paper && roundInfo.playerChoise == enGameChoice::Stone) {
+        gameresults.computer2WinTimes++;
+        roundInfo.winner = enWinner::Computer;
+        WinnerName(roundInfo);
+        PrintGameOverScreen(roundInfo);
+        system("color 4F"); cout << "\a";
+    }
+    else {
+        gameresults.player1WinTimes++;
+        roundInfo.winner = enWinner::Player1;
+        WinnerName(roundInfo);
+        PrintGameOverScreen(roundInfo);
+        system("color 2F");
+    }
+}
+void ShowGameOverScreen(stGameResults& gameresults) {
+    stRoundInfo roundInfo;
+    short number = 0;
+    do {
+        cout << "\n\nRound [" << ++roundInfo.roundNumber << "] begins:\n";
+        
+        do
+        {
+            cout << "\nYour Choice: [1]:Stone, [2]:Paper, [3]:Scissors?\n";
+            cin >> number;
+        } while (number < 1 || number > 3);
+        
+        
+        switch (number)
+        {
+        case 1: roundInfo.playerChoise = Stone; break;
+        case 2: roundInfo.playerChoise = Paper; break;
+        case 3: roundInfo.playerChoise = Scissors; break;
+        default:
+            break;
+        }
+       
+        number = RandomNumber(1, 3);
+        switch (number)
+        {
+        case 1: roundInfo.computerChoice = Stone; break;
+        case 2: roundInfo.computerChoice = Paper; break;
+        case 3: roundInfo.computerChoice = Scissors; break;
+        default:
+            break;
+        }
+        
+        WhoWinner(roundInfo, gameresults);
+    
+    } while (roundInfo.roundNumber < gameresults.gameRounds);
+
+    //delete roundInfo;
+}
+
+void CheckWhoWinner(stGameResults & gameResults) {
+
+    if (gameResults.computer2WinTimes > gameResults.player1WinTimes)
+        gameResults.winnerName = "Computer";
+    else if(gameResults.computer2WinTimes < gameResults.player1WinTimes)
+        gameResults.winnerName = "Player1";
+
+}
+void ShowFinalGameResults(stGameResults gameResults) {
+    CheckWhoWinner(gameResults);
+    cout << endl << endl << endl;
+    cout << "----------------------------------------------------------" << endl;
+    cout << "\t\t+++ G A M E O V E R +++\t\t" << endl;
+    cout << "----------------------------------------------------------" << endl;
+    cout << "______________________[Game Results]______________________" << endl;
+    cout << "Game Rounds\t   :" << gameResults.gameRounds << endl;
+    cout << "Player1 won times  :" << gameResults.player1WinTimes << endl;
+    cout << "Computer won times :" << gameResults.computer2WinTimes << endl;
+    cout << "Draw times\t   :" << gameResults.drawTimes << endl;
+    cout << "Final Winner\t   :" << gameResults.winnerName << endl;
+    cout << "----------------------------------------------------------" << endl;
+
+}
+
+void ResetScreen() {
+
+    system("cls");
+    system("color 0F");
+}
+
+void StartGame() {
+
+    char choose = 'Y';
+    
+    do {
+        stGameResults gameResults;
+        ResetScreen();
+        ReadHowManyRounds(gameResults);
+        ShowGameOverScreen(gameResults);
+        ShowFinalGameResults(gameResults);
+
+        cout << "Do you want to play again? Y/N? "; cin >> choose;
+
+    } while (toupper(choose) == 'Y');
+    
+    
+}
+
+int main()
+{
+	srand((unsigned)time(NULL));
+
+	StartGame();
+
+	return 0;
+}
